@@ -4,18 +4,20 @@ import numpy as np
 from constants import *
 from lidar import Lidar
 
-class Robot:
+class Robot(pygame.sprite.Sprite):
+    
     def __init__(self, startpose, robotImg):
+        pygame.sprite.Sprite.__init__(self)
         self.m2p = 3779.52
         self.x = startpose[0]
         self.y = startpose[1]
         self.theta = 0
         self.vel = 0.01 * self.m2p
         self.ver = 0.01 * self.m2p
-        self.img = pygame.image.load(robotImg)
-        self.width = self.img.get_width()
-
-        self.rotated = self.img
+        self.image = pygame.image.load(robotImg)
+        self.width = self.image.get_width()
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rotated = self.image
         self.rect = self.rotated.get_rect(center = (self.x, self.y))
         self.lidar = Lidar(position=(self.x, self.y))
         self.rays = []
@@ -42,7 +44,7 @@ class Robot:
         self.x += ((self.vel+self.ver)/2) * math.cos(self.theta) * dt
         self.y -= ((self.vel+self.ver)/2) * math.sin(self.theta) * dt
         self.theta += (self.ver - self.vel) / self.width * dt
-        self.rotated = pygame.transform.rotozoom(self.img, math.degrees(self.theta), 1)
+        self.rotated = pygame.transform.rotozoom(self.image, math.degrees(self.theta), 1)
         self.rect = self.rotated.get_rect(center = (self.x, self.y))
         self.lidar.setPosition(self.x, self.y)
         self.lasttime = pygame.time.get_ticks()

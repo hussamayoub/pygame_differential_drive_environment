@@ -37,7 +37,7 @@ class Lidar(object):
                     continue
 
                 color = env.map.get_at((x_t,y_t))
-                if color[:-1] == env.black:
+                if color[:-1] != env.white:
                     data.append((x_t, y_t))
                     break
                 
