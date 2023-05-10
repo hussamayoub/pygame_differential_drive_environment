@@ -42,26 +42,48 @@ class Environment(pygame.sprite.Sprite):
         for robot in self.robots:
             robot.drawRays(self)
 
+        ## Lines
+            pygame.draw.line(self.map, self.red, (self.robots[0].x,self.robots[0].y), (self.robots[1].x,self.robots[1].y))
+            pygame.draw.line(self.map, self.red, (self.robots[1].x,self.robots[1].y), (self.robots[2].x,self.robots[2].y))
+            pygame.draw.line(self.map, self.red, (self.robots[2].x,self.robots[2].y), (self.robots[3].x,self.robots[3].y))
+            pygame.draw.line(self.map, self.red, (self.robots[0].x,self.robots[0].y), (self.robots[3].x,self.robots[3].y))
+
+
+
+
+
     def checkCollision(self):
         collisionrects = []
         index = 0
         for idx, robot in enumerate(self.robots):
             collisionrects.append(robot.rect.inflate(100,100))
             if self.mask.overlap(robot.mask, (robot.x, robot.y)):
-                print('Collision With Map')
+                return True
 
         for i in range(len(collisionrects)):
             for j in range(i+1, len(collisionrects)):
                 if collisionrects[i].colliderect(collisionrects[j]):
                     pass
-                    print('Collision With Robot')
-                
+                    return True
+        return False      
 
     def step(self, velocitiesArray):
         counter = 0
         for robot in self.robots:
-            robot.move(velocitiesArray[counter][0], velocitiesArray[counter][1])
+            robot.move(velocitiesArray[counter][0], velocitiesArray[counter][1], velocitiesArray[counter][2])
             counter += 1
-        self.checkCollision()
+        terminating = self.checkCollision()
+        pygame.display.update()
+        self.refresh()
+        return terminating
+    
+    def setManualPose(self, pose):
+        counter = 0
+        for robot in self.robots:
+            try:
+                robot.setPose(pose[counter][0], pose[counter][1], pose[counter][2])
+            except:
+                pass
+            counter += 1
         pygame.display.update()
         self.refresh()
