@@ -22,24 +22,29 @@ class Robot(pygame.sprite.Sprite):
         self.lidar = Lidar(position=(self.x, self.y))
         self.rays = []
         self.lasttime = 0
+        self.lidarData = []
+        self.rllv = 0
+        self.rlav = 0
 
     def draw(self, map):
         map.map.blit(self.rotated, self.rect)
 
     def scan(self, map):
-        # data, self.rays = self.lidar.scan(map)
-        pass        
+        self.lidarData, self.rays = self.lidar.scan(map, self.theta)
+                
     def drawRays(self,map):
-        # for ray in self.rays:
-        #     x0 = int(ray[0])
-        #     y0 = int(ray[1])
-        #     xt = int(ray[2])
-        #     yt = int(ray[3])
-        #     pygame.draw.line(map.map, self.lidar.color, (x0,y0), (xt,yt))
-        pass
+        for ray in self.rays:
+            x0 = int(ray[0])
+            y0 = int(ray[1])
+            xt = int(ray[2])
+            yt = int(ray[3])
+            pygame.draw.line(map.map, self.lidar.color, (x0,y0), (xt,yt))
 
     def move(self, linear, angular, ICC):
-        dt = (pygame.time.get_ticks() - self.lasttime) / 1000
+        self.rllv = linear
+        self.rlav = angular
+        # dt = (pygame.time.get_ticks() - self.lasttime) / 1000
+        dt = 0.1
         self.ver = ( (linear * self.m2p) + (angular *  ( (ICC * self.m2p) + (self.width/2))) )
         self.vel = ( (linear * self.m2p) + (angular *  ( (ICC * self.m2p) - (self.width/2))) )
 
@@ -52,7 +57,7 @@ class Robot(pygame.sprite.Sprite):
 
         self.lidar.setPosition(self.x, self.y)
 
-        self.lasttime = pygame.time.get_ticks()
+        # self.lasttime = pygame.time.get_ticks()
 
     def setPose(self, X, Y, Theta):
         self.x = X

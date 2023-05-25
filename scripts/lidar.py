@@ -20,13 +20,13 @@ class Lidar(object):
     def distance(self, x_e, y_e):
         return distance(self.position[0], self.position[1], x_e, y_e)
 
-    def scan(self, env):
+    def scan(self, env, theta):
         data = []
         rays = []
         x_0, y_0 = self.position[0], self.position[1]
-        for angle in np.linspace(0, 2*math.pi, 60, False):
+        for angle in np.linspace(0, 2*math.pi, 5, False):
             # get distance at current angle
-            x_i, y_i = (x_0 + self.range * math.cos(angle)), (y_0 - self.range * math.sin(angle))
+            x_i, y_i = (x_0 + self.range * math.cos(angle+theta)), (y_0 - self.range * math.sin(angle+theta))
             
             # find endpoint
             for i in range(13,100):
@@ -38,9 +38,13 @@ class Lidar(object):
 
                 color = env.map.get_at((x_t,y_t))
                 if color[:-1] != env.white:
-                    data.append((x_t, y_t))
+                    # data.append((x_t, y_t))
                     break
                 
             if (i != 99):
-                rays.append((x_0, y_0, x_t, y_t))                    
+                rays.append((x_0, y_0, x_t, y_t))
+                data.append(round(math.sqrt(((x_i - x_0)) ** 2) + ((y_t - y_0) ** 2),2))
+
+            elif i >= 99:
+                data.append((0))
         return data, rays
